@@ -2,7 +2,8 @@
   (:gen-class)
   (:require [clojure-socket-data-collector.socket.core :as core]
             [clojure-socket-data-collector.socket.framing :as framing]
-            [clojure-socket-data-collector.processing :refer [data-collector-reduction]]))
+            [clojure-socket-data-collector.processing :refer [data-collector-reduction]]
+            [clojure-socket-data-collector.logging :refer :all]))
 
 (def protocol
   {:frame-extractor framing/text-endl
@@ -13,6 +14,6 @@
 
 (defn -main
   [& args]
-  (println "Starting server")
+  (info "Starting server")
   (core/close-on-shutdown server-handle)
   (core/start-server server-handle))

@@ -1,5 +1,6 @@
 (ns clojure-socket-data-collector.socket.core
-  (:require [clojure.core.async :as async])
+  (:require [clojure.core.async :as async]
+            [clojure-socket-data-collector.logging :refer :all])
   (:import [java.net ServerSocket InetSocketAddress SocketException]))
 
 
@@ -21,12 +22,12 @@
         frame-extractor (:frame-extractor proto)
         consumer (-> proto :reduction :consumer)]
 
-    (println "Client connected" client)
+    (info "Client connected" client)
     (frame-extractor input-stream frame-chan)
     (async/go
       (let [result-chan (transduce-proto proto frame-chan)
             result (async/<! result-chan)]
-        (println "Client disconnected" client)
+        (info "Client disconnected" client)
         (if consumer
           (consumer result))))))
 
@@ -45,16 +46,16 @@
   "Listen for incoming connections"
   [handle]
   (.bind (:server-socket handle) (:listen-address handle))
-  (println "Listening on" (-> handle :listen-address str))
+  (info "Listening on" (-> handle :listen-address str))
   (try
     (loop []
       (let [sock (.accept (:server-socket handle))]
         (handle-client (:protocol handle) sock))
       (recur))
-    (catch SocketException e (println (.getMessage e)))))
+    (catch SocketException e (info (.getMessage e)))))
 
 (defn stop-server [handle]
-  (println "Closing server")
+  (info "Closing server")
   (.close (:server-socket handle)))
 
 (defn- register-sigterm-handler
