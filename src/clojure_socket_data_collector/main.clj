@@ -5,15 +5,14 @@
             [clojure-socket-data-collector.processing :refer [data-collector-reduction]]))
 
 (def protocol
-  {:type  :tcp
-   :frame-extractor framing/text-endl
+  {:frame-extractor framing/text-endl
    :reduction data-collector-reduction})
 
 (def addr (core/listen-address 6900))
+(def server-handle (core/create-server addr protocol))
 
 (defn -main
   [& args]
   (println "Starting server")
-  (let [handle (core/create-server addr protocol)]
-    (core/close-on-shutdown handle)
-    (core/start-server handle)))
+  (core/close-on-shutdown server-handle)
+  (core/start-server server-handle))

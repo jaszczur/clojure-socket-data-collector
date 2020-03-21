@@ -4,6 +4,7 @@
 
 
 (defn listen-address
+  "Create inet socket address"
   ([addr port]
    (InetSocketAddress. addr port))
   ([port]
@@ -13,9 +14,9 @@
   (let [reduction (:reduction proto)]
     (async/transduce (:xform reduction) (:reducer reduction) (:init reduction) frame-chan)))
 
-(defn handle-client [proto sock]
+(defn- handle-client [proto sock]
   (let [input-stream (.getInputStream sock)
-        client (-> sock .getInetAddress .toString)
+        client (-> sock .getInetAddress str)
         frame-chan (async/chan)
         frame-extractor (:frame-extractor proto)
         consumer (-> proto :reduction :consumer)]
@@ -30,29 +31,39 @@
           (consumer result))))))
 
 
-(defn create-server [addr proto]
+(defn create-server
+  "Create a server handle
+
+  Result is a description of the server"
+  [addr proto]
   (let [ss (ServerSocket.)]
     {:server-socket ss
      :listen-address addr
      :protocol proto}))
 
-(defn start-server [handle]
-    (.bind (:server-socket handle) (:listen-address handle))
-    (try
-      (loop []
-        (let [sock (.accept (:server-socket handle))]
-          (handle-client (:protocol handle) sock))
-        (recur))
-      (catch SocketException e (println (.getMessage e)))))
+(defn start-server
+  "Listen for incoming connections"
+  [handle]
+  (.bind (:server-socket handle) (:listen-address handle))
+  (println "Listening on" (-> handle :listen-address str))
+  (try
+    (loop []
+      (let [sock (.accept (:server-socket handle))]
+        (handle-client (:protocol handle) sock))
+      (recur))
+    (catch SocketException e (println (.getMessage e)))))
 
 (defn stop-server [handle]
   (println "Closing server")
   (.close (:server-socket handle)))
 
-(defn register-sigterm-handler [handler]
+(defn- register-sigterm-handler
+  [handler]
   (.addShutdownHook
    (Runtime/getRuntime)
    (Thread. handler)))
 
-(defn close-on-shutdown [handle]
+(defn close-on-shutdown
+  "(Not so) gently close server when JVM is about to terminate"
+  [handle]
   (register-sigterm-handler #(stop-server handle)))
