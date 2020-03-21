@@ -1,36 +1,65 @@
 (ns clojure-socket-data-collector.processing
-  (:require [clojure-socket-data-collector.logging :refer :all]))
+  (:require [clojure-socket-data-collector.logging :refer :all]
+            [clojure.spec.alpha :as s]))
 
-(defn log [frame]
-  (debug frame)
-  frame)
+;; Input data spec
 
-(defn one [frame]
-  1)
+(def numbers-regex #"^[0-9]+\.?[0-9]*$")
+
+(s/def ::str-with-number
+  (s/and string? #(re-matches numbers-regex %)))
+
+(def csv-data-spec
+  (s/cat :luminosity   ::str-with-number
+         :temperature  ::str-with-number
+         :humidity     ::str-with-number))
+
+;; Processing steps building blocks
+
+(defn log [x]
+  (debug x)
+  x)
 
 (defn split-csv-line [csv-line]
   (clojure.string/split csv-line #","))
 
 (defn is-valid-csv-data [csv-data]
-  (let [valid (= (count csv-data) 3)]
+  (let [valid (s/valid? csv-data-spec csv-data)]
     (if (not valid)
-      (warn "Invalid CSV data:" csv-data))
+      (do
+        (warn "Invalid CSV data:" csv-data)
+        (debug (clojure.string/trim (s/explain-str csv-data-spec csv-data)))))
     valid))
 
-(defn parse-record [csv-data]
-  csv-data)
+(defn parse-numbers [csv-data]
+  (map #(Double/parseDouble %)
+       csv-data))
+
+(defn create-record [[lum temp hum]]
+  {:luminosity  lum
+   :temperature temp
+   :humidity    hum})
+
+;; Result
+
+(defn count-records
+  ([num record]
+   (debug record)
+   (inc num))
+  ([num]
+   (info "Handled" num "records")))
+
+;; Processing definition
 
 (def process-data
   (comp
-   (filter #(not (empty? %1)))
+   (filter #(not (empty? %)))
    (map split-csv-line)
    (filter is-valid-csv-data)
-   (map parse-record)
-   (map one)))
+   (map parse-numbers)
+   (map create-record)))
 
 (def data-collector-reduction
   {:xform process-data
    :init 0
-   :reducer +
-   :consumer (fn [result]
-               (info "Handled" result "records"))})
+   :reducer count-records})

@@ -27,9 +27,7 @@
     (async/go
       (let [result-chan (transduce-proto proto frame-chan)
             result (async/<! result-chan)]
-        (info "Client disconnected" client)
-        (if consumer
-          (consumer result))))))
+        (info "Client disconnected" client)))))
 
 
 (defn create-server
