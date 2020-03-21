@@ -3,17 +3,27 @@
   (:require [clojure-arduino-data-collector.core :as core]
             [clojure-arduino-data-collector.framing :as framing]))
 
-;; TODO: use transducers
+(defn log [frame]
+  (println frame)
+  frame)
+
+(defn one [frame]
+  1)
+
+(def process-data
+  (comp
+   (filter #(not (empty? %1)))
+   (map log)
+   (map one)))
 
 (def protocol
   {:type  :tcp
    :frame-extractor framing/text-endl
-   :accumulator 0
-   :consumer (fn [acc frame]
-               (println frame)
-               (inc acc))
-   :on-closed (fn [acc]
-                (println "Handled" acc "records"))})
+   :transducer {:xform process-data
+                :init 0
+                :reducer +}
+   :on-closed (fn [result]
+                (println "Handled" result "records"))})
 
 (def addr (core/listen-address 6900))
 
