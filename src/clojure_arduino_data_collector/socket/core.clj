@@ -1,4 +1,4 @@
-(ns clojure-arduino-data-collector.core
+(ns clojure-arduino-data-collector.socket.core
   (:require [clojure.core.async :as async])
   (:import [java.net ServerSocket InetSocketAddress SocketException]))
 
@@ -10,23 +10,24 @@
    (InetSocketAddress. port)))
 
 (defn- transduce-proto [proto frame-chan]
-  (let [tducer (:transducer proto)]
-    (async/transduce (:xform tducer) (:reducer tducer) (:init tducer) frame-chan)))
+  (let [reduction (:reduction proto)]
+    (async/transduce (:xform reduction) (:reducer reduction) (:init reduction) frame-chan)))
 
 (defn handle-client [proto sock]
   (let [input-stream (.getInputStream sock)
         client (-> sock .getInetAddress .toString)
         frame-chan (async/chan)
         frame-extractor (:frame-extractor proto)
-        consumer (:consumer proto)]
+        consumer (-> proto :reduction :consumer)]
+
     (println "Client connected" client)
     (frame-extractor input-stream frame-chan)
     (async/go
       (let [result-chan (transduce-proto proto frame-chan)
             result (async/<! result-chan)]
         (println "Client disconnected" client)
-        (if (:on-closed proto)
-          ((:on-closed proto) result))))))
+        (if consumer
+          (consumer result))))))
 
 
 (defn create-server [addr proto]

@@ -6,6 +6,6 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/core.async "1.0.567"]]
   :main  ^:skip-aot clojure-arduino-data-collector.main
-  :repl-options {:init-ns clojure-arduino-data-collector.core}
+  :repl-options {:init-ns clojure-arduino-data-collector.main}
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

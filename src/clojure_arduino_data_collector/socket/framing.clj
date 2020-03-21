@@ -1,4 +1,4 @@
-(ns clojure-arduino-data-collector.framing
+(ns clojure-arduino-data-collector.socket.framing
   (:require [clojure.core.async :as async])
   (:import [java.io BufferedReader]))
 
