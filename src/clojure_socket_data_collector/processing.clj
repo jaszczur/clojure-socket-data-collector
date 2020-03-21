@@ -38,16 +38,8 @@
 (defn create-record [[lum temp hum]]
   {:luminosity  lum
    :temperature temp
-   :humidity    hum})
-
-;; Result
-
-(defn count-records
-  ([num record]
-   (debug record)
-   (inc num))
-  ([num]
-   (info "Handled" num "records")))
+   :humidity    hum
+   :timestamp   (System/currentTimeMillis)})
 
 ;; Processing definition
 
@@ -58,8 +50,3 @@
    (filter is-valid-csv-data)
    (map parse-numbers)
    (map create-record)))
-
-(def data-collector-reduction
-  {:xform process-data
-   :init 0
-   :reducer count-records})

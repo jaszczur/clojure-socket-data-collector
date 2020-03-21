@@ -11,23 +11,15 @@
   ([port]
    (InetSocketAddress. port)))
 
-(defn- transduce-proto [proto frame-chan]
-  (let [reduction (:reduction proto)]
-    (async/transduce (:xform reduction) (:reducer reduction) (:init reduction) frame-chan)))
-
-(defn- handle-client [proto sock]
+(defn- handle-client [proto sock data-chan]
   (let [input-stream (.getInputStream sock)
         client (-> sock .getInetAddress str)
         frame-chan (async/chan)
-        frame-extractor (:frame-extractor proto)
-        consumer (-> proto :reduction :consumer)]
+        frame-extractor (:frame-extractor proto)]
 
     (info "Client connected" client)
     (frame-extractor input-stream frame-chan)
-    (async/go
-      (let [result-chan (transduce-proto proto frame-chan)
-            result (async/<! result-chan)]
-        (info "Client disconnected" client)))))
+    (async/pipe frame-chan data-chan false)))
 
 
 (defn create-server
@@ -42,15 +34,18 @@
 
 (defn start-server
   "Listen for incoming connections"
-  [handle]
+  [handle data-channel]
   (.bind (:server-socket handle) (:listen-address handle))
   (info "Listening on" (-> handle :listen-address str))
-  (try
-    (loop []
-      (let [sock (.accept (:server-socket handle))]
-        (handle-client (:protocol handle) sock))
-      (recur))
-    (catch SocketException e (info (.getMessage e)))))
+  (async/thread
+    (try
+      (loop []
+        (let [sock (.accept (:server-socket handle))]
+          (handle-client (:protocol handle) sock data-channel))
+        (recur))
+      (catch SocketException e (info (.getMessage e)))
+      (finally (async/close! data-channel))))
+  data-channel)
 
 (defn stop-server [handle]
   (info "Closing server")
