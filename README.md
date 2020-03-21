@@ -1,14 +1,15 @@
-# clojure-arduino-data-collector
+# clojure-socket-data-collector
 
-A Clojure library designed to ... well, that part is up to you.
+A simple TCP socket data collector suitable for collecting data from low processing power units such as Arduino + Ethernet/WiFi boards.
 
 ## Usage
 
-FIXME
+Fork a repo and implement your logic. Sorry - no package for now ;)
+
 
 ## License
 
-Copyright © 2020 FIXME
+Copyright © 2020 Piotr Jaszczyk
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at

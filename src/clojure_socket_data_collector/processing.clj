@@ -1,4 +1,4 @@
-(ns clojure-arduino-data-collector.processing)
+(ns clojure-socket-data-collector.processing)
 
 (defn log [frame]
   (println frame)

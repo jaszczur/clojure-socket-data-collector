@@ -1,4 +1,4 @@
-(ns clojure-arduino-data-collector.socket.core
+(ns clojure-socket-data-collector.socket.core
   (:require [clojure.core.async :as async])
   (:import [java.net ServerSocket InetSocketAddress SocketException]))
 

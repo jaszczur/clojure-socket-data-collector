@@ -1,8 +1,8 @@
-(ns clojure-arduino-data-collector.main
+(ns clojure-socket-data-collector.main
   (:gen-class)
-  (:require [clojure-arduino-data-collector.socket.core :as core]
-            [clojure-arduino-data-collector.socket.framing :as framing]
-            [clojure-arduino-data-collector.processing :refer [data-collector-reduction]]))
+  (:require [clojure-socket-data-collector.socket.core :as core]
+            [clojure-socket-data-collector.socket.framing :as framing]
+            [clojure-socket-data-collector.processing :refer [data-collector-reduction]]))
 
 (def protocol
   {:type  :tcp

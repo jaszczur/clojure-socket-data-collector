@@ -1,6 +1,6 @@
-(ns clojure-arduino-data-collector.core-test
+(ns clojure-socket-data-collector.core-test
   (:require [clojure.test :refer :all]
-            [clojure-arduino-data-collector.core :refer :all]))
+            [clojure-socket-data-collector.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
