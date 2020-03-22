@@ -16,37 +16,43 @@
 
 ;; Processing steps building blocks
 
-(defn log [x]
-  (debug x)
-  x)
+(defn split-csv-line [frame]
+  (update frame :data
+    #(clojure.string/split % #",")))
 
-(defn split-csv-line [csv-line]
-  (clojure.string/split csv-line #","))
-
-(defn is-valid-csv-data [csv-data]
-  (let [valid (s/valid? csv-data-spec csv-data)]
+(defn contains-valid-csv-data [frame]
+  (let [csv-data (:data frame)
+        valid (s/valid? csv-data-spec csv-data)]
     (if (not valid)
       (do
-        (warn "Invalid CSV data:" csv-data)
-        (debug (clojure.string/trim (s/explain-str csv-data-spec csv-data)))))
+        (warn (:client frame ) "Invalid CSV data:" csv-data)
+        (debug (:client frame) (clojure.string/trim (s/explain-str csv-data-spec csv-data)))))
     valid))
 
-(defn parse-numbers [csv-data]
-  (map #(Double/parseDouble %)
-       csv-data))
+(defn str-to-num [string]
+  (Double/parseDouble string))
 
-(defn create-record [[lum temp hum]]
+(defn parse-numbers [frame]
+  (update frame
+          :data
+          #(map str-to-num %)))
+
+(defn create-record [{
+                      ts :timestamp
+                      {client-id :uuid} :client
+                      [lum temp hum] :data}]
   {:luminosity  lum
    :temperature temp
    :humidity    hum
-   :timestamp   (System/currentTimeMillis)})
+   :timestamp   ts
+   :source      client-id})
 
 ;; Processing definition
 
 (def process-data
   (comp
-   (filter #(not (empty? %)))
+   (filter #(not (empty? (:data %))))
    (map split-csv-line)
-   (filter is-valid-csv-data)
+   (filter contains-valid-csv-data)
    (map parse-numbers)
    (map create-record)))

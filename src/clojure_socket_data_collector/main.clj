@@ -6,7 +6,7 @@
             [clojure-socket-data-collector.logging :refer :all]
             [clojure.core.async :as async]))
 
-(def ^:dynamic *buffer-size* 16)
+(def ^:dynamic *data-buffer-size* 128)
 
 (def protocol
   {:frame-extractor framing/text-endl})
@@ -18,7 +18,7 @@
   [& args]
   (info "Starting server")
   (core/close-on-shutdown server-handle)
-  (let [data-chan (async/chan (async/buffer *buffer-size*) process-data)]
+  (let [data-chan (async/chan (async/buffer *data-buffer-size*) process-data)]
     (core/start-server server-handle data-chan)
     (loop [record (async/<!! data-chan)]
       (if (nil? record)
