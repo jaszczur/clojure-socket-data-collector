@@ -4,7 +4,8 @@
             [clojure-socket-data-collector.socket.framing :as framing]
             [clojure-socket-data-collector.processing :refer [process-data]]
             [clojure-socket-data-collector.logging :refer :all]
-            [clojure.core.async :as async]))
+            [clojure.core.async :as async]
+            [clojure.data.json :as json]))
 
 (def ^:dynamic *data-buffer-size* 128)
 
@@ -24,5 +25,5 @@
       (if (nil? record)
         (info "Bye")
         (do
-          (debug record)
+          (data (json/write-str record))
           (recur (async/<!! data-chan)))))))

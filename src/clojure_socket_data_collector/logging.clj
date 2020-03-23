@@ -1,5 +1,10 @@
 (ns clojure-socket-data-collector.logging)
 
+
+(defn data [& msg]
+  (apply println (cons "DATA:  " msg)))
+
+
 (defn debug [& msg]
   (apply println (cons "DEBUG: " msg)))
 

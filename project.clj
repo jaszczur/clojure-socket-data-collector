@@ -5,7 +5,8 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/core.async "1.0.567"]
-                 [org.clojure/spec.alpha "0.2.187"]]
+                 [org.clojure/spec.alpha "0.2.187"]
+                 [org.clojure/data.json "1.0.0"]]
   :main  ^:skip-aot clojure-socket-data-collector.main
   :repl-options {:init-ns clojure-socket-data-collector.main}
   :target-path "target/%s"

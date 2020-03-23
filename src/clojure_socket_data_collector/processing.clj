@@ -4,7 +4,7 @@
 
 ;; Input data spec
 
-(def numbers-regex #"^[0-9]+\.?[0-9]*$")
+(def numbers-regex #"^-?[0-9]+\.?[0-9]*$")
 
 (s/def ::str-with-number
   (s/and string? #(re-matches numbers-regex %)))
