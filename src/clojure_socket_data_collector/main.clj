@@ -3,9 +3,9 @@
   (:require [clojure-socket-data-collector.socket.core :as core]
             [clojure-socket-data-collector.socket.framing :as framing]
             [clojure-socket-data-collector.processing :refer [process-data]]
+            [clojure-socket-data-collector.writer :refer [store-data-sync]]
             [clojure-socket-data-collector.logging :refer :all]
-            [clojure.core.async :as async]
-            [clojure.data.json :as json]))
+            [clojure.core.async :as async]))
 
 (def ^:dynamic *data-buffer-size* 128)
 
@@ -21,9 +21,4 @@
   (core/close-on-shutdown server-handle)
   (let [data-chan (async/chan (async/buffer *data-buffer-size*) process-data)]
     (core/start-server server-handle data-chan)
-    (loop [record (async/<!! data-chan)]
-      (if (nil? record)
-        (info "Bye")
-        (do
-          (data (json/write-str record))
-          (recur (async/<!! data-chan)))))))
+    (store-data-sync "./data/" data-chan)))
