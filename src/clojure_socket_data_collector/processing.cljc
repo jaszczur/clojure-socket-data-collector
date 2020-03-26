@@ -1,5 +1,5 @@
 (ns clojure-socket-data-collector.processing
-  (:require [clojure-socket-data-collector.logging :refer :all]
+  (:require [clojure-socket-data-collector.logging :refer [debug warn info]]
             [clojure.spec.alpha :as s]))
 
 ;; Input data spec
@@ -30,7 +30,8 @@
     valid))
 
 (defn str-to-num [string]
-  (Double/parseDouble string))
+  #?(:clj (Double/parseDouble string)
+     :cljs (js/Number.parseFloat string)))
 
 (defn parse-numbers [frame]
   (update frame

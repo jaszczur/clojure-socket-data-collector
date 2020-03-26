@@ -1,0 +1,16 @@
+{:deps {org.clojure/clojure    {:mvn/version "1.10.1"}
+        org.clojure/core.async {:mvn/version "1.0.567"}
+        org.clojure/spec.alpha {:mvn/version "0.2.187"}
+        org.clojure/data.json  {:mvn/version "1.0.0"}}
+ :aliases {:cljs
+           {:extra-deps {thheller/shadow-cljs {:mvn/version "2.8.93"}}}
+           :uberjar
+           {:extra-deps {pack/pack.alpha {:git/url "https://github.com/juxt/pack.alpha.git"
+                                          :sha "c70740ffc10805f34836da2160fa1899601fac02"}}
+            :main-opts ["-m"
+                        "mach.pack.alpha.capsule"
+                        "target/uberjar.jar"
+                        "--application-id"
+                        "clojure-socket-data-collector"
+                        "--main"
+                        "clojure-socket-data-collector.main"]}}}

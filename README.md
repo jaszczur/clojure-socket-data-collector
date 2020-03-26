@@ -6,11 +6,28 @@ A simple TCP socket data collector suitable for collecting data from low process
 
 Fork a repo and implement your logic. Sorry - no package for now ;)
 
-```bash
-lein uberjar
-java -jar target/uberjar/clojure-socket-data-collector-0.1.0-SNAPSHOT-standalone.jar
+### JVM
 
-# Somewhere else
+```bash
+clj -m clojure-socket-data-collector.main
+
+# Or with JAR-file
+clj -A:uberjar
+java -jar target/uberjar.jar 
+```
+
+### NodeJS
+
+```bash
+clj -A:cljs -m shadow.cljs.devtools.cli compile app
+
+# or if you have shadow-cljs installed
+shadow-cljs compile app
+```
+
+## Manual testing
+
+```bash
 nc localhost 6900
 ```
 

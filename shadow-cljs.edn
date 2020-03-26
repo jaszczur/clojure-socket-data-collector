@@ -1,0 +1,6 @@
+{:deps {:aliases [:cljs]}
+ :source-paths ["src"]
+ :builds
+ {:app {:target :node-script
+        :main clojure-socket-data-collector.main/main
+        :output-to "target/nodejs/index.js"}}}
